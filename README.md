@@ -12,11 +12,30 @@ A beautiful, responsive web application that automatically generates and publish
 
 ## What This Tool Does
 
-This Instagram Post Generator allows you to:
+This Instagram Post Generator provides a complete content creation workflow:
+
+### 🎬 **Generate Phase**
 1. Enter product title and description
 2. Provide an image URL for your product
-3. Automatically generate and publish Instagram posts with the provided content
-4. Get instant confirmation when your post is successfully created
+3. Watch real-time progress as AI generates your content
+4. See step-by-step processing indicators
+
+### 📱 **Preview Phase**
+5. View an authentic Instagram post preview
+6. See your generated caption and optimized image
+7. Review how your post will look on Instagram
+
+### ✅ **Confirmation Phase**
+8. Approve or deny the generated post
+9. Make adjustments if needed
+10. Publish directly to Instagram with one click
+11. Get confirmation when your post goes live
+
+### 🔄 **Smart Workflow**
+- **Real-time progress tracking** with animated indicators
+- **Bidirectional communication** with n8n workflows
+- **Session management** for reliable processing
+- **Error handling** with graceful fallbacks
 
 ## Quick Start
 
@@ -65,30 +84,149 @@ This Instagram Post Generator allows you to:
 
 ## Configuration
 
-### Setting Up the Webhook URL
+### n8n Workflow Integration
 
-Before the form will work, you need to update the webhook URL in the code:
+This application requires a properly configured n8n workflow to handle the complete process. Here's what you need to set up:
 
-1. **Edit the JavaScript**:
-   - Open `index.html` in your code editor
-   - Find this line (around line 204):
+#### Required n8n Workflow Structure
+
+Your n8n workflow should have **three main endpoints**:
+
+1. **🔄 Generation Endpoint** (`/webhook`) - Initial post generation
+2. **📊 Status Endpoint** (`/status/{sessionId}`) - Progress polling
+3. **✅ Confirmation Endpoint** (`/confirm`) - Final publishing
+
+#### 1. Generation Workflow Setup
+
+**Webhook Node Configuration:**
+```json
+{
+  "httpMethod": "POST",
+  "path": "webhook",
+  "responseMode": "onReceived"
+}
+```
+
+**Expected Input Data:**
+```json
+{
+  "Product Title": "Your product name",
+  "Product Description": "Detailed description",
+  "Image URL": "https://example.com/image.jpg",
+  "sessionId": "session_123456789_abc",
+  "action": "generate_preview"
+}
+```
+
+**Required Processing:**
+- Generate engaging Instagram caption using AI (ChatGPT/Claude)
+- Optimize image if needed
+- Store session data for later retrieval
+- Return immediately (don't wait for completion)
+
+#### 2. Status Polling Endpoint
+
+**Webhook Node Configuration:**
+```json
+{
+  "httpMethod": "GET",
+  "path": "status/{{$node.Webhook.json.sessionId}}",
+  "responseMode": "respondToWebhook"
+}
+```
+
+**Expected Response Format:**
+```json
+{
+  "status": "completed|processing|failed",
+  "preview": {
+    "imageUrl": "https://example.com/optimized-image.jpg",
+    "caption": "Generated Instagram caption with hashtags",
+    "username": "your_brand_name"
+  }
+}
+```
+
+#### 3. Confirmation/Publishing Workflow
+
+**Webhook Node Configuration:**
+```json
+{
+  "httpMethod": "POST",
+  "path": "confirm",
+  "responseMode": "respondToWebhook"
+}
+```
+
+**Expected Input Data:**
+```json
+{
+  "sessionId": "session_123456789_abc",
+  "action": "confirm_publish",
+  "Product Title": "Product name",
+  "Product Description": "Description", 
+  "Image URL": "Image URL"
+}
+```
+
+**Required Processing:**
+- Retrieve generated content using sessionId
+- Post to Instagram API
+- Return success confirmation
+
+### Frontend Configuration
+
+#### Update Webhook URLs
+
+1. **Edit the JavaScript in `index.html`**:
    ```javascript
-   const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
-   ```
-   
-2. **Replace with your actual webhook URL**:
-   ```javascript
-   const WEBHOOK_URL = 'https://your-actual-webhook-url.com/webhook';
+   // Line ~537-538
+   const WEBHOOK_URL = 'https://your-n8n-instance.com/webhook-test/YOUR_WEBHOOK_ID';
+   const CONFIRM_URL = 'https://your-n8n-instance.com/webhook-test/YOUR_WEBHOOK_ID/confirm';
    ```
 
-3. **Commit and push your changes**:
+2. **Commit and deploy**:
    ```bash
    git add index.html
-   git commit -m "Update webhook URL"
+   git commit -m "Update n8n webhook URLs"
    git push origin main
    ```
 
-Cloudflare Pages will automatically redeploy your site with the new webhook URL.
+#### n8n Workflow Best Practices
+
+**Session Management:**
+- Store session data in n8n memory/database
+- Use unique session IDs for tracking
+- Clean up old sessions periodically
+
+**Error Handling:**
+- Return proper HTTP status codes
+- Include error messages in responses
+- Implement retry logic for API calls
+
+**Performance Optimization:**
+- Use async processing where possible
+- Implement caching for repeated operations
+- Add timeout handling for long-running tasks
+
+### Example n8n Workflow Structure
+
+```
+┌─ Webhook (Generate) 
+├─ Store Session Data
+├─ AI Caption Generation
+├─ Image Processing
+└─ Set Status: "completed"
+
+┌─ Webhook (Status Check)
+├─ Retrieve Session Data  
+└─ Return Status & Preview
+
+┌─ Webhook (Confirm)
+├─ Retrieve Final Data
+├─ Instagram API Post
+└─ Return Success
+```
 
 ## Project Structure
 
