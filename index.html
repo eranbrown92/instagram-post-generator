@@ -589,39 +589,6 @@
             }, 800); // Update every 800ms
         }
 
-        // Simplified: Direct response with preview (no polling needed)
-        async function handleDirectResponse(response) {
-            try {
-                const data = await response.json();
-                
-                if (data.preview) {
-                    // If n8n returns preview directly
-                    showPreview(data.preview);
-                } else if (data.caption || data.description) {
-                    // If n8n returns caption directly
-                    showPreview({
-                        imageUrl: currentFormData['Image URL'],
-                        caption: data.caption || data.description,
-                        username: 'your_brand'
-                    });
-                } else {
-                    // Fallback: generate simple preview
-                    showPreview({
-                        imageUrl: currentFormData['Image URL'],
-                        caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #awesome`,
-                        username: 'your_brand'
-                    });
-                }
-            } catch (error) {
-                console.error('Response parsing error:', error);
-                // Show fallback preview
-                showPreview({
-                    imageUrl: currentFormData['Image URL'],
-                    caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #generated`,
-                    username: 'your_brand'
-                });
-            }
-        }
 
         // Show preview with generated content
         function showPreview(previewData) {
@@ -685,8 +652,14 @@
 
                 if (response.ok) {
                     // Handle direct response (simplified approach)
-                    setTimeout(() => {
-                        handleDirectResponse(response);
+                    setTimeout(async () => {
+                        const data = await response.json();
+                        // Use AI generated caption directly
+                        showPreview({
+                            imageUrl: currentFormData['Image URL'],
+                            caption: data.output?.description || data.description || `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`,
+                            username: 'your_brand'
+                        });
                     }, 3000); // Wait for progress animation to look realistic
                 } else {
                     throw new Error('Network response was not ok');
@@ -709,15 +682,14 @@
             
             try {
                 // Send confirmation to n8n to actually post
-                const response = await fetch(CONFIRM_URL, {
+                const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        sessionId: currentSessionId,
-                        action: 'confirm_publish',
-                        ...currentFormData
+                        ...currentFormData,
+                        action: 'confirm_publish' // This tells n8n to actually post
                     })
                 });
 
