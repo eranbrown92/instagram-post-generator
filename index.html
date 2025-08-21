@@ -57,9 +57,206 @@
             display: block;
         }
 
-        .success-page {
+        .success-page,
+        .loading-page,
+        .preview-page {
             display: none;
             text-align: center;
+        }
+
+        /* Loading Page Styles */
+        .loading-page {
+            text-align: center;
+        }
+
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e8ecf4;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .loading-steps {
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .step.pending .step-icon {
+            background: #e8ecf4;
+            color: #666;
+        }
+
+        .step.active .step-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        .step.completed .step-icon {
+            background: #10b981;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Preview Page Styles */
+        .preview-page {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .instagram-preview {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .instagram-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .post-content {
+            padding: 16px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .post-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #262626;
+            text-align: left;
+        }
+
+        .post-text .username {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .confirm-btn,
+        .deny-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .deny-btn {
+            background: transparent;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .deny-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-2px);
         }
 
         .form-group {
@@ -249,13 +446,85 @@
             </form>
         </div>
 
+        <!-- Loading Page -->
+        <div id="loadingPage" class="loading-page">
+            <div class="header">
+                <h1>🎬 Creating Magic</h1>
+                <p>Generating your Instagram post...</p>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="progressText">0%</div>
+            </div>
+
+            <div class="loading-steps">
+                <div class="step pending" id="step1">
+                    <div class="step-icon">1</div>
+                    <span>Analyzing your product details</span>
+                </div>
+                <div class="step pending" id="step2">
+                    <div class="step-icon">2</div>
+                    <span>Generating engaging caption</span>
+                </div>
+                <div class="step pending" id="step3">
+                    <div class="step-icon">3</div>
+                    <span>Optimizing image and layout</span>
+                </div>
+                <div class="step pending" id="step4">
+                    <div class="step-icon">4</div>
+                    <span>Creating Instagram post preview</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Page -->
+        <div id="previewPage" class="preview-page">
+            <div class="header">
+                <h1>📱 Post Preview</h1>
+                <p>How your Instagram post will look</p>
+            </div>
+
+            <div class="instagram-preview">
+                <div class="instagram-header">
+                    <div class="profile-pic">YB</div>
+                    <div class="username">your_brand</div>
+                </div>
+                
+                <img class="post-image" id="previewImage" src="" alt="Product image" />
+                
+                <div class="post-content">
+                    <div class="post-actions">
+                        <button class="action-btn">❤️</button>
+                        <button class="action-btn">💬</button>
+                        <button class="action-btn">📤</button>
+                    </div>
+                    <div class="post-text">
+                        <span class="username">your_brand</span>
+                        <span id="previewCaption">Your generated caption will appear here...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="confirmation-buttons">
+                <button class="confirm-btn" onclick="confirmPost()">
+                    ✅ Post It!
+                </button>
+                <button class="deny-btn" onclick="denyPost()">
+                    ❌ Try Again
+                </button>
+            </div>
+        </div>
+
         <!-- Success Page -->
         <div id="successPage" class="success-page">
             <div class="success-icon"></div>
-            <h2 class="success-title">Post Generated!</h2>
+            <h2 class="success-title">Post Published!</h2>
             <p class="success-message">
-                Your Instagram post has been created and published successfully. 
-                Check your Instagram account to see the magic! ✨
+                Your Instagram post has been published successfully! 
+                Check your Instagram account to see it live! ✨
             </p>
             <button class="new-post-btn" onclick="resetForm()">
                 Create Another Post
@@ -264,70 +533,259 @@
     </div>
 
     <script>
-        // Replace this with your actual webhook URL
+        // Configuration
         const WEBHOOK_URL = 'https://automate.tech-takeover.net/webhook-test/8f109fee-9713-4709-8ec2-957935850dc0';
+        const CONFIRM_URL = 'https://automate.tech-takeover.net/webhook-test/8f109fee-9713-4709-8ec2-957935850dc0/confirm'; // Add /confirm endpoint
+        
+        let currentSessionId = null;
+        let currentFormData = null;
 
+        // Navigation functions
+        function showPage(pageId) {
+            const pages = ['formPage', 'loadingPage', 'previewPage', 'successPage'];
+            pages.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        // Loading progress simulation
+        function simulateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            
+            let progress = 0;
+            let stepIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5; // Random progress between 5-20%
+                
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                }
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+                
+                // Update steps
+                const currentStepProgress = (progress / 100) * steps.length;
+                const activeStepIndex = Math.floor(currentStepProgress);
+                
+                // Mark completed steps
+                for (let i = 0; i < activeStepIndex && i < steps.length; i++) {
+                    const step = document.getElementById(steps[i]);
+                    step.className = 'step completed';
+                    step.querySelector('.step-icon').textContent = '✓';
+                }
+                
+                // Mark active step
+                if (activeStepIndex < steps.length) {
+                    const activeStep = document.getElementById(steps[activeStepIndex]);
+                    activeStep.className = 'step active';
+                }
+                
+            }, 800); // Update every 800ms
+        }
+
+        // Poll for workflow completion
+        async function pollForCompletion(sessionId) {
+            const maxAttempts = 60; // 60 attempts = 30 seconds max
+            let attempts = 0;
+            
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                
+                try {
+                    // Poll your n8n workflow status endpoint
+                    const response = await fetch(`${WEBHOOK_URL}/status/${sessionId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        if (data.status === 'completed' && data.preview) {
+                            clearInterval(pollInterval);
+                            showPreview(data.preview);
+                        } else if (data.status === 'failed') {
+                            clearInterval(pollInterval);
+                            handleError('Post generation failed. Please try again.');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+                
+                // Timeout after max attempts
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    // Still show preview with original data as fallback
+                    showPreview({
+                        imageUrl: currentFormData['Image URL'],
+                        caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #generated`,
+                        username: 'your_brand'
+                    });
+                }
+            }, 500); // Poll every 500ms
+        }
+
+        // Show preview with generated content
+        function showPreview(previewData) {
+            // Update preview image
+            const previewImage = document.getElementById('previewImage');
+            previewImage.src = previewData.imageUrl;
+            previewImage.onerror = function() {
+                this.style.display = 'flex';
+                this.innerHTML = '<div style="text-align: center;">Image preview not available</div>';
+            };
+            
+            // Update caption
+            document.getElementById('previewCaption').textContent = previewData.caption;
+            
+            // Update username if provided
+            if (previewData.username) {
+                const usernames = document.querySelectorAll('.username');
+                usernames.forEach(username => {
+                    username.textContent = previewData.username;
+                });
+                
+                // Update profile pic
+                const profilePic = document.querySelector('.profile-pic');
+                profilePic.textContent = previewData.username.substring(0, 2).toUpperCase();
+            }
+            
+            showPage('previewPage');
+        }
+
+        // Handle form submission
         document.getElementById('postForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-
-            // Show loading state
-            submitBtn.disabled = true;
-            btnText.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-
+            // Store form data
+            currentFormData = {
+                'Product Title': document.getElementById('productTitle').value,
+                'Product Description': document.getElementById('productDescription').value,
+                'Image URL': document.getElementById('imageUrl').value
+            };
+            
+            // Generate session ID
+            currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Show loading page
+            showPage('loadingPage');
+            simulateProgress();
+            
             try {
-                const formData = {
-                    'Product Title': document.getElementById('productTitle').value,
-                    'Product Description': document.getElementById('productDescription').value,
-                    'Image URL': document.getElementById('imageUrl').value
-                };
-
+                // Send to n8n workflow with session ID
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        ...currentFormData,
+                        sessionId: currentSessionId,
+                        action: 'generate_preview' // Tell n8n this is for preview only
+                    })
                 });
 
                 if (response.ok) {
-                    // Show success page
-                    document.getElementById('formPage').style.display = 'none';
-                    document.getElementById('successPage').style.display = 'block';
+                    // Start polling for completion
+                    pollForCompletion(currentSessionId);
                 } else {
                     throw new Error('Network response was not ok');
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Something went wrong. Please try again!');
-                
-                // Reset button state
-                submitBtn.disabled = false;
-                btnText.style.display = 'block';
-                loadingSpinner.style.display = 'none';
+                handleError('Something went wrong. Please try again!');
             }
         });
 
-        function resetForm() {
-            // Reset form and show form page
-            document.getElementById('postForm').reset();
-            document.getElementById('formPage').style.display = 'block';
-            document.getElementById('successPage').style.display = 'none';
+        // Confirm and publish post
+        async function confirmPost() {
+            const confirmBtn = document.querySelector('.confirm-btn');
+            const originalText = confirmBtn.innerHTML;
             
-            // Reset button state
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
+            // Show loading state on confirm button
+            confirmBtn.innerHTML = '⏳ Publishing...';
+            confirmBtn.disabled = true;
             
-            submitBtn.disabled = false;
-            btnText.style.display = 'block';
-            loadingSpinner.style.display = 'none';
+            try {
+                // Send confirmation to n8n to actually post
+                const response = await fetch(CONFIRM_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sessionId: currentSessionId,
+                        action: 'confirm_publish',
+                        ...currentFormData
+                    })
+                });
+
+                if (response.ok) {
+                    showPage('successPage');
+                } else {
+                    throw new Error('Failed to publish post');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                handleError('Failed to publish post. Please try again.');
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            }
         }
+
+        // Deny post and go back to form
+        function denyPost() {
+            resetForm();
+        }
+
+        // Handle errors
+        function handleError(message) {
+            alert(message);
+            resetForm();
+        }
+
+        // Reset form to initial state
+        function resetForm() {
+            // Reset form data
+            document.getElementById('postForm').reset();
+            currentSessionId = null;
+            currentFormData = null;
+            
+            // Reset progress
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+            
+            // Reset steps
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                step.className = 'step pending';
+                step.querySelector('.step-icon').textContent = index + 1;
+            });
+            
+            // Reset buttons
+            const confirmBtn = document.querySelector('.confirm-btn');
+            confirmBtn.innerHTML = '✅ Post It!';
+            confirmBtn.disabled = false;
+            
+            // Show form page
+            showPage('formPage');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('formPage');
+        });
     </script>
 </body>
 </html>
