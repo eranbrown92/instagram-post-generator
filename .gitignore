@@ -130,3 +130,7 @@ dist/
 
 # Cloudflare
 .wrangler
+
+# Private workflow files
+*.json
+n8n-workflows/

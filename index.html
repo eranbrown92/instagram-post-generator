@@ -589,49 +589,38 @@
             }, 800); // Update every 800ms
         }
 
-        // Poll for workflow completion
-        async function pollForCompletion(sessionId) {
-            const maxAttempts = 60; // 60 attempts = 30 seconds max
-            let attempts = 0;
-            
-            const pollInterval = setInterval(async () => {
-                attempts++;
+        // Simplified: Direct response with preview (no polling needed)
+        async function handleDirectResponse(response) {
+            try {
+                const data = await response.json();
                 
-                try {
-                    // Poll your n8n workflow status endpoint
-                    const response = await fetch(`${WEBHOOK_URL}/status/${sessionId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        
-                        if (data.status === 'completed' && data.preview) {
-                            clearInterval(pollInterval);
-                            showPreview(data.preview);
-                        } else if (data.status === 'failed') {
-                            clearInterval(pollInterval);
-                            handleError('Post generation failed. Please try again.');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Polling error:', error);
-                }
-                
-                // Timeout after max attempts
-                if (attempts >= maxAttempts) {
-                    clearInterval(pollInterval);
-                    // Still show preview with original data as fallback
+                if (data.preview) {
+                    // If n8n returns preview directly
+                    showPreview(data.preview);
+                } else if (data.caption || data.description) {
+                    // If n8n returns caption directly
                     showPreview({
                         imageUrl: currentFormData['Image URL'],
-                        caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #generated`,
+                        caption: data.caption || data.description,
+                        username: 'your_brand'
+                    });
+                } else {
+                    // Fallback: generate simple preview
+                    showPreview({
+                        imageUrl: currentFormData['Image URL'],
+                        caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #awesome`,
                         username: 'your_brand'
                     });
                 }
-            }, 500); // Poll every 500ms
+            } catch (error) {
+                console.error('Response parsing error:', error);
+                // Show fallback preview
+                showPreview({
+                    imageUrl: currentFormData['Image URL'],
+                    caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #instagram #generated`,
+                    username: 'your_brand'
+                });
+            }
         }
 
         // Show preview with generated content
@@ -695,8 +684,10 @@
                 });
 
                 if (response.ok) {
-                    // Start polling for completion
-                    pollForCompletion(currentSessionId);
+                    // Handle direct response (simplified approach)
+                    setTimeout(() => {
+                        handleDirectResponse(response);
+                    }, 3000); // Wait for progress animation to look realistic
                 } else {
                     throw new Error('Network response was not ok');
                 }
