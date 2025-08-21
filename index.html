@@ -651,16 +651,31 @@
                 });
 
                 if (response.ok) {
-                    // Handle direct response (simplified approach)
-                    setTimeout(async () => {
+                    // Wait for actual API response
+                    try {
                         const data = await response.json();
-                        // Use AI generated caption directly
+                        console.log('API Response:', data); // Debug log
+                        
+                        // Use AI generated caption from the response
+                        const generatedCaption = data.preview?.caption || 
+                                               data.output?.description || 
+                                               data.description ||
+                                               `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`;
+                        
                         showPreview({
                             imageUrl: currentFormData['Image URL'],
-                            caption: data.output?.description || data.description || `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`,
+                            caption: generatedCaption,
+                            username: data.preview?.username || 'your_brand'
+                        });
+                    } catch (error) {
+                        console.error('Error parsing response:', error);
+                        // Fallback preview
+                        showPreview({
+                            imageUrl: currentFormData['Image URL'],
+                            caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`,
                             username: 'your_brand'
                         });
-                    }, 3000); // Wait for progress animation to look realistic
+                    }
                 } else {
                     throw new Error('Network response was not ok');
                 }
