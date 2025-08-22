@@ -180,13 +180,57 @@
 
         .post-image {
             width: 100%;
-            height: 300px;
+            height: 400px;
             object-fit: cover;
             background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #666;
+            border-radius: 0;
+            transition: height 0.3s ease;
+        }
+
+        .post-image.square {
+            height: 400px;
+            aspect-ratio: 1/1;
+        }
+
+        .post-image.portrait {
+            height: 500px;
+            aspect-ratio: 4/5;
+        }
+
+        .post-image.landscape {
+            height: 225px;
+            aspect-ratio: 16/9;
+        }
+
+        .image-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+
+        .fit-btn {
+            padding: 8px 16px;
+            border: 2px solid #e8ecf4;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fit-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .fit-btn:hover {
+            border-color: #667eea;
         }
 
         .post-content {
@@ -273,7 +317,8 @@
 
         input[type="text"],
         input[type="url"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 16px 20px;
             border: 2px solid #e8ecf4;
@@ -286,7 +331,8 @@
 
         input[type="text"]:focus,
         input[type="url"]:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
@@ -439,6 +485,15 @@
                     <input type="url" id="imageUrl" name="imageUrl" required placeholder="https://example.com/your-image.jpg">
                 </div>
 
+                <div class="form-group">
+                    <label for="aspectRatio">Instagram Format</label>
+                    <select id="aspectRatio" name="aspectRatio">
+                        <option value="square">📱 Square (1:1) - Most Popular</option>
+                        <option value="portrait">📱 Portrait (4:5) - Better Engagement</option>
+                        <option value="landscape">📱 Landscape (16:9) - Stories/Reels</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="submit-btn" id="submitBtn">
                     <span id="btnText">🚀 Generate Post</span>
                     <div id="loadingSpinner" class="loading-spinner"></div>
@@ -493,7 +548,12 @@
                     <div class="username">your_brand</div>
                 </div>
                 
-                <img class="post-image" id="previewImage" src="" alt="Product image" />
+                <img class="post-image square" id="previewImage" src="" alt="Product image" />
+                
+                <div class="image-controls">
+                    <button class="fit-btn active" onclick="setImageFit('cover')" id="coverBtn">📐 Crop to Fit</button>
+                    <button class="fit-btn" onclick="setImageFit('contain')" id="containBtn">📏 Show Full Image</button>
+                </div>
                 
                 <div class="post-content">
                     <div class="post-actions">
@@ -599,6 +659,10 @@
                 this.innerHTML = '<div style="text-align: center;">Image preview not available</div>';
             };
             
+            // Apply selected aspect ratio
+            const aspectRatio = document.getElementById('aspectRatio').value;
+            applyAspectRatio(aspectRatio);
+            
             // Update caption
             document.getElementById('previewCaption').textContent = previewData.caption;
             
@@ -617,6 +681,29 @@
             showPage('previewPage');
         }
 
+        // Apply aspect ratio to preview image
+        function applyAspectRatio(ratio) {
+            const previewImage = document.getElementById('previewImage');
+            previewImage.className = `post-image ${ratio}`;
+        }
+
+        // Set image fit (cover vs contain)
+        function setImageFit(fitType) {
+            const previewImage = document.getElementById('previewImage');
+            previewImage.style.objectFit = fitType;
+            
+            // Update button states
+            document.getElementById('coverBtn').classList.toggle('active', fitType === 'cover');
+            document.getElementById('containBtn').classList.toggle('active', fitType === 'contain');
+            
+            // Add padding for contain mode to center better
+            if (fitType === 'contain') {
+                previewImage.style.backgroundColor = '#f8f9fa';
+            } else {
+                previewImage.style.backgroundColor = 'transparent';
+            }
+        }
+
         // Handle form submission
         document.getElementById('postForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -625,7 +712,8 @@
             currentFormData = {
                 'Product Title': document.getElementById('productTitle').value,
                 'Product Description': document.getElementById('productDescription').value,
-                'Image URL': document.getElementById('imageUrl').value
+                'Image URL': document.getElementById('imageUrl').value,
+                'Aspect Ratio': document.getElementById('aspectRatio').value
             };
             
             // Generate session ID
