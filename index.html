@@ -486,6 +486,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="affiliateLink">Affiliate Link</label>
+                    <input type="url" id="affiliateLink" name="affiliateLink" placeholder="https://example.com/affiliate-link">
+                </div>
+
+                <div class="form-group">
                     <label for="aspectRatio">Instagram Format</label>
                     <select id="aspectRatio" name="aspectRatio">
                         <option value="square">📱 Square (1:1) - Most Popular</option>
@@ -594,7 +599,8 @@
 
     <script>
         // Configuration
-        const WEBHOOK_URL = 'https://automate.tech-takeover.net/webhook/8f109fee-9713-4709-8ec2-957935850dc0';
+        //const WEBHOOK_URL = 'https://automate.tech-takeover.net/webhook/8f109fee-9713-4709-8ec2-957935850dc0';
+        const WEBHOOK_URL = "https://automate.tech-takeover.net/webhook-test/8f109fee-9713-4709-8ec2-957935850dc0"
         
         let currentSessionId = null;
         let currentFormData = null;
@@ -713,6 +719,7 @@
                 'Product Title': document.getElementById('productTitle').value,
                 'Product Description': document.getElementById('productDescription').value,
                 'Image URL': document.getElementById('imageUrl').value,
+                'Affiliate Link': document.getElementById('affiliateLink').value,
                 'Aspect Ratio': document.getElementById('aspectRatio').value
             };
             
