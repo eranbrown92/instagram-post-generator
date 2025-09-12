@@ -503,6 +503,10 @@
                     <span id="btnText">🚀 Generate Post</span>
                     <div id="loadingSpinner" class="loading-spinner"></div>
                 </button>
+                
+                <button type="button" class="new-post-btn" onclick="clearSavedData(); location.reload();" style="margin-top: 15px; width: 100%;">
+                    🗑️ Clear Saved Data
+                </button>
             </form>
         </div>
 
@@ -604,6 +608,39 @@
         
         let currentSessionId = null;
         let currentFormData = null;
+        let generatedCaption = null;
+
+        // LocalStorage functions
+        function saveFormData() {
+            const formData = {
+                productTitle: document.getElementById('productTitle').value,
+                productDescription: document.getElementById('productDescription').value,
+                imageUrl: document.getElementById('imageUrl').value,
+                affiliateLink: document.getElementById('affiliateLink').value,
+                aspectRatio: document.getElementById('aspectRatio').value
+            };
+            localStorage.setItem('postGeneratorFormData', JSON.stringify(formData));
+        }
+
+        function loadFormData() {
+            const savedData = localStorage.getItem('postGeneratorFormData');
+            if (savedData) {
+                try {
+                    const formData = JSON.parse(savedData);
+                    document.getElementById('productTitle').value = formData.productTitle || '';
+                    document.getElementById('productDescription').value = formData.productDescription || '';
+                    document.getElementById('imageUrl').value = formData.imageUrl || '';
+                    document.getElementById('affiliateLink').value = formData.affiliateLink || '';
+                    document.getElementById('aspectRatio').value = formData.aspectRatio || 'square';
+                } catch (error) {
+                    console.error('Error loading saved form data:', error);
+                }
+            }
+        }
+
+        function clearSavedData() {
+            localStorage.removeItem('postGeneratorFormData');
+        }
 
         // Navigation functions
         function showPage(pageId) {
@@ -614,49 +651,76 @@
             document.getElementById(pageId).style.display = 'block';
         }
 
-        // Loading progress simulation
-        function simulateProgress() {
+        // Real loading progress based on API status
+        function startRealProgress() {
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const steps = ['step1', 'step2', 'step3', 'step4'];
             
-            let progress = 0;
-            let stepIndex = 0;
+            // Start with step 1 active
+            updateStep('step1', 'active');
+            progressFill.style.width = '10%';
+            progressText.textContent = '10%';
             
-            const interval = setInterval(() => {
-                progress += Math.random() * 15 + 5; // Random progress between 5-20%
-                
-                if (progress > 100) {
+            // Slow progress until we get API response
+            let progress = 10;
+            const slowInterval = setInterval(() => {
+                if (progress < 80) { // Don't go past 80% until API responds
+                    progress += Math.random() * 3 + 1; // Very slow progress
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = Math.round(progress) + '%';
+                    
+                    // Update steps based on progress
+                    if (progress > 25 && !document.getElementById('step2').classList.contains('active')) {
+                        updateStep('step1', 'completed');
+                        updateStep('step2', 'active');
+                    }
+                    if (progress > 50 && !document.getElementById('step3').classList.contains('active')) {
+                        updateStep('step2', 'completed');
+                        updateStep('step3', 'active');
+                    }
+                }
+            }, 1000);
+            
+            return slowInterval;
+        }
+
+        function completeProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            // Complete all steps
+            updateStep('step3', 'completed');
+            updateStep('step4', 'active');
+            
+            // Quick animation to 100%
+            let progress = 80;
+            const completeInterval = setInterval(() => {
+                progress += 5;
+                if (progress >= 100) {
                     progress = 100;
-                    clearInterval(interval);
+                    updateStep('step4', 'completed');
+                    clearInterval(completeInterval);
                 }
-                
                 progressFill.style.width = progress + '%';
-                progressText.textContent = Math.round(progress) + '%';
-                
-                // Update steps
-                const currentStepProgress = (progress / 100) * steps.length;
-                const activeStepIndex = Math.floor(currentStepProgress);
-                
-                // Mark completed steps
-                for (let i = 0; i < activeStepIndex && i < steps.length; i++) {
-                    const step = document.getElementById(steps[i]);
-                    step.className = 'step completed';
-                    step.querySelector('.step-icon').textContent = '✓';
-                }
-                
-                // Mark active step
-                if (activeStepIndex < steps.length) {
-                    const activeStep = document.getElementById(steps[activeStepIndex]);
-                    activeStep.className = 'step active';
-                }
-                
-            }, 800); // Update every 800ms
+                progressText.textContent = progress + '%';
+            }, 100);
+        }
+
+        function updateStep(stepId, status) {
+            const step = document.getElementById(stepId);
+            step.className = `step ${status}`;
+            if (status === 'completed') {
+                step.querySelector('.step-icon').textContent = '✓';
+            }
         }
 
 
         // Show preview with generated content
         function showPreview(previewData) {
+            // Store the generated caption for later use
+            generatedCaption = previewData.caption;
+            
             // Update preview image
             const previewImage = document.getElementById('previewImage');
             previewImage.src = previewData.imageUrl;
@@ -726,9 +790,9 @@
             // Generate session ID
             currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             
-            // Show loading page
+            // Show loading page and start real progress
             showPage('loadingPage');
-            simulateProgress();
+            const progressInterval = startRealProgress();
             
             try {
                 // Send to n8n workflow with session ID
@@ -740,81 +804,42 @@
                     body: JSON.stringify({
                         ...currentFormData,
                         sessionId: currentSessionId,
-                        action: 'generate_preview' // Tell n8n this is for preview only
+                        action: 'confirm_publish' // Skip preview, go straight to publish
                     })
                 });
 
+                // Clear the slow progress interval since API responded
+                clearInterval(progressInterval);
+
                 if (response.ok) {
-                    // Wait for actual API response
-                    try {
-                        const data = await response.json();
-                        console.log('API Response:', data); // Debug log
-                        
-                        // Use AI generated caption from the response
-                        const generatedCaption = data.preview?.caption || 
-                                               data.output?.description || 
-                                               data.description ||
-                                               `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`;
-                        
-                        showPreview({
-                            imageUrl: currentFormData['Image URL'],
-                            caption: generatedCaption,
-                            username: data.preview?.username || 'your_brand'
-                        });
-                    } catch (error) {
-                        console.error('Error parsing response:', error);
-                        // Fallback preview
-                        showPreview({
-                            imageUrl: currentFormData['Image URL'],
-                            caption: `🚀 ${currentFormData['Product Title']}\n\n${currentFormData['Product Description']}\n\n#product #awesome`,
-                            username: 'your_brand'
-                        });
-                    }
+                    // Complete the progress bar
+                    completeProgress();
+                    
+                    // Wait a moment for the animation to finish
+                    setTimeout(async () => {
+                        try {
+                            const data = await response.json();
+                            console.log('API Response:', data); // Debug log
+                            
+                            // Post published successfully - go to success page
+                            showPage('successPage');
+                        } catch (error) {
+                            console.error('Error parsing response:', error);
+                            showPage('successPage'); // Show success anyway
+                        }
+                    }, 1000); // Wait 1 second for progress animation
                 } else {
                     throw new Error('Network response was not ok');
                 }
 
             } catch (error) {
+                // Clear progress interval on error
+                clearInterval(progressInterval);
                 console.error('Error:', error);
                 handleError('Something went wrong. Please try again!');
             }
         });
 
-        // Confirm and publish post
-        async function confirmPost() {
-            const confirmBtn = document.querySelector('.confirm-btn');
-            const originalText = confirmBtn.innerHTML;
-            
-            // Show loading state on confirm button
-            confirmBtn.innerHTML = '⏳ Publishing...';
-            confirmBtn.disabled = true;
-            
-            try {
-                // Send confirmation to n8n to actually post
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        ...currentFormData,
-                        action: 'confirm_publish' // This tells n8n to actually post
-                    })
-                });
-
-                if (response.ok) {
-                    showPage('successPage');
-                } else {
-                    throw new Error('Failed to publish post');
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                handleError('Failed to publish post. Please try again.');
-                confirmBtn.innerHTML = originalText;
-                confirmBtn.disabled = false;
-            }
-        }
 
         // Deny post and go back to form
         function denyPost() {
@@ -827,10 +852,8 @@
             resetForm();
         }
 
-        // Reset form to initial state
+        // Reset form to initial state (but keep saved data)
         function resetForm() {
-            // Reset form data
-            document.getElementById('postForm').reset();
             currentSessionId = null;
             currentFormData = null;
             
@@ -850,13 +873,24 @@
             confirmBtn.innerHTML = '✅ Post It!';
             confirmBtn.disabled = false;
             
-            // Show form page
+            // Show form page (form data will remain from localStorage)
             showPage('formPage');
         }
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             showPage('formPage');
+            
+            // Load saved form data on page load
+            loadFormData();
+            
+            // Auto-save form data as user types
+            const formFields = ['productTitle', 'productDescription', 'imageUrl', 'affiliateLink', 'aspectRatio'];
+            formFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.addEventListener('input', saveFormData);
+                field.addEventListener('change', saveFormData);
+            });
         });
     </script>
 </body>
