@@ -26,7 +26,7 @@
             border-radius: 24px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.15);
             padding: 50px;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             transition: all 0.6s ease;
         }
@@ -445,17 +445,290 @@
             transform: translateY(-2px);
         }
 
+        /* Mode Toggle Styles */
+        .mode-toggle {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .mode-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .mode-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+            z-index: 2;
+            position: relative;
+        }
+
+        .mode-btn.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .mode-btn:hover:not(.active) {
+            color: #667eea;
+        }
+
+        .scheduling-section {
+            background: #f8f9fa;
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .scheduling-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .schedule-input-group label {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .quick-schedule label {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quick-btn {
+            padding: 12px 16px;
+            border: 2px solid #e8ecf4;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .quick-btn:hover {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .quick-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .series-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e8ecf4;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .growth-tip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .tip-header {
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .growth-tip p {
+            margin: 0;
+            font-size: 13px;
+            color: #047857;
+            line-height: 1.4;
+        }
+
+        input[type="datetime-local"] {
+            font-family: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: #fafbfc;
+            border: 2px solid #e8ecf4;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s ease;
+            color: #333;
+            cursor: pointer;
+        }
+
+        input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            padding: 4px;
+            margin-left: 8px;
+        }
+
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            transform: scale(1.1);
+        }
+
+        /* Firefox datetime styling */
+        input[type="datetime-local"]::-moz-placeholder {
+            color: #666;
+            opacity: 1;
+        }
+
+        input[type="datetime-local"]::placeholder {
+            color: #666;
+        }
+
+        /* Schedule Success Page Styles */
+        .schedule-success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: successPulse 0.6s ease-out;
+            font-size: 40px;
+        }
+
+        .schedule-info {
+            background: #f8f9fa;
+            border: 2px solid #e8ecf4;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .schedule-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e8ecf4;
+        }
+
+        .schedule-detail:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .schedule-value {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .manage-schedule-btn {
+            background: transparent;
+            color: #10b981;
+            border: 2px solid #10b981;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .manage-schedule-btn:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .quick-buttons {
+                flex-direction: row;
+                gap: 6px;
+            }
+
+            .quick-btn {
+                flex: 1;
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 40px 30px;
             }
-            
+
             .header h1 {
                 font-size: 28px;
             }
 
             .header p {
                 font-size: 16px;
+            }
+
+            .quick-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .mode-btn {
+                font-size: 14px;
+                padding: 12px 16px;
             }
         }
     </style>
@@ -466,7 +739,21 @@
         <div id="formPage" class="form-page">
             <div class="header">
                 <h1>📸 Post Generator</h1>
-                <p>Create engaging Instagram content in seconds</p>
+                <p>Create engaging Instagram content</p>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+                <div class="mode-option">
+                    <button type="button" class="mode-btn active" id="postNowBtn" onclick="setMode('immediate')">
+                        🚀 Post Now
+                    </button>
+                </div>
+                <div class="mode-option">
+                    <button type="button" class="mode-btn" id="scheduleBtn" onclick="setMode('scheduled')">
+                        📅 Schedule Post
+                    </button>
+                </div>
             </div>
 
             <form id="postForm">
@@ -490,20 +777,49 @@
                     <input type="url" id="affiliateLink" name="affiliateLink" placeholder="https://example.com/affiliate-link">
                 </div>
 
-                <div class="form-group">
-                    <label for="aspectRatio">Instagram Format</label>
-                    <select id="aspectRatio" name="aspectRatio">
-                        <option value="square">📱 Square (1:1) - Most Popular</option>
-                        <option value="portrait">📱 Portrait (4:5) - Better Engagement</option>
-                        <option value="landscape">📱 Landscape (16:9) - Stories/Reels</option>
-                    </select>
+
+                <!-- Scheduling Section (Hidden by default) -->
+                <div id="schedulingSection" class="scheduling-section" style="display: none;">
+                    <div class="form-group">
+                        <label for="scheduleDateTime">📅 Schedule Date & Time</label>
+                        <input type="datetime-local" id="scheduleDateTime" name="scheduleDateTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quick Schedule</label>
+                        <div class="quick-buttons">
+                            <button type="button" class="quick-btn" onclick="setQuickSchedule('tomorrow-morning')">
+                                ☀️ Tomorrow 7 AM (Prime)
+                            </button>
+                            <button type="button" class="quick-btn" onclick="setQuickSchedule('tomorrow-lunch')">
+                                🍽️ Tomorrow 12 PM (Lunch)
+                            </button>
+                            <button type="button" class="quick-btn" onclick="setQuickSchedule('tomorrow-evening')">
+                                🌆 Tomorrow 5 PM (Evening)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seriesName">📂 Series Name (Optional)</label>
+                        <input type="text" id="seriesName" name="seriesName" placeholder="e.g., Tech Reviews, Product Launches...">
+                        <small class="form-hint">Group related posts together for better organization</small>
+                    </div>
+
+                    <!-- Growth Strategy Info -->
+                    <div class="growth-tip">
+                        <div class="tip-header">💡 Growth Strategy</div>
+                        <p><strong>Primary:</strong> 7 AM post (best performance)<br>
+                        <strong>Backup:</strong> If morning underperforms, post at lunch (12 PM) or evening (5 PM)<br>
+                        <em>Minimum 10 reels/month to avoid algorithm deprioritization</em></p>
+                    </div>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">
                     <span id="btnText">🚀 Generate Post</span>
                     <div id="loadingSpinner" class="loading-spinner"></div>
                 </button>
-                
+
                 <button type="button" class="new-post-btn" onclick="clearSavedData(); location.reload();" style="margin-top: 15px; width: 100%;">
                     🗑️ Clear Saved Data
                 </button>
@@ -592,32 +908,58 @@
             <div class="success-icon"></div>
             <h2 class="success-title">Post Published!</h2>
             <p class="success-message">
-                Your Instagram post has been published successfully! 
+                Your Instagram post has been published successfully!
                 Check your Instagram account to see it live! ✨
             </p>
             <button class="new-post-btn" onclick="resetForm()">
                 Create Another Post
             </button>
         </div>
+
+        <!-- Schedule Success Page -->
+        <div id="scheduleSuccessPage" class="success-page">
+            <div class="schedule-success-icon">📅</div>
+            <h2 class="success-title">Post Scheduled!</h2>
+            <p class="success-message" id="scheduleSuccessMessage">
+                Your Instagram post has been scheduled successfully!
+                It will be automatically published at the scheduled time. ⏰
+            </p>
+            <div class="schedule-info" id="scheduleInfo">
+                <!-- Schedule details will be populated here -->
+            </div>
+            <div class="schedule-actions">
+                <button class="new-post-btn" onclick="resetForm()">
+                    Schedule Another Post
+                </button>
+                <button class="manage-schedule-btn" onclick="openScheduleManager()">
+                    📊 Manage Schedule
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         // Configuration
         const WEBHOOK_URL = 'https://automate.tech-takeover.net/webhook/8f109fee-9713-4709-8ec2-957935850dc0';
-        //const WEBHOOK_URL = "https://automate.tech-takeover.net/webhook-test/8f109fee-9713-4709-8ec2-957935850dc0"
-        
+        //const WEBHOOK_URL = "https://automate.tech-takeover.net/webhook-test/8f109fee-9713-4709-8ec2-957935850dc0";
+
+        // Node.js server for scheduled posts
+        // const LOCAL_SCHEDULER_URL = "http://localhost:3001/api/schedule"; // Development
+        const LOCAL_SCHEDULER_URL = "https://schedule.qwiktechtips.com/api/schedule"; // Production via Cloudflare Tunnel
+
         let currentSessionId = null;
         let currentFormData = null;
-        let generatedCaption = null;
 
-        // LocalStorage functions
+        // Unified localStorage functions
         function saveFormData() {
             const formData = {
                 productTitle: document.getElementById('productTitle').value,
                 productDescription: document.getElementById('productDescription').value,
                 imageUrl: document.getElementById('imageUrl').value,
                 affiliateLink: document.getElementById('affiliateLink').value,
-                aspectRatio: document.getElementById('aspectRatio').value
+                scheduleDateTime: document.getElementById('scheduleDateTime').value,
+                seriesName: document.getElementById('seriesName').value,
+                currentMode: getCurrentMode()
             };
             localStorage.setItem('postGeneratorFormData', JSON.stringify(formData));
         }
@@ -631,7 +973,13 @@
                     document.getElementById('productDescription').value = formData.productDescription || '';
                     document.getElementById('imageUrl').value = formData.imageUrl || '';
                     document.getElementById('affiliateLink').value = formData.affiliateLink || '';
-                    document.getElementById('aspectRatio').value = formData.aspectRatio || 'square';
+                    document.getElementById('scheduleDateTime').value = formData.scheduleDateTime || '';
+                    document.getElementById('seriesName').value = formData.seriesName || '';
+
+                    // Restore mode
+                    if (formData.currentMode) {
+                        setMode(formData.currentMode, false);
+                    }
                 } catch (error) {
                     console.error('Error loading saved form data:', error);
                 }
@@ -642,13 +990,145 @@
             localStorage.removeItem('postGeneratorFormData');
         }
 
+        // Mode management functions
+        function getCurrentMode() {
+            return document.getElementById('postNowBtn').classList.contains('active') ? 'immediate' : 'scheduled';
+        }
+
+        function setMode(mode, saveData = true) {
+            const postNowBtn = document.getElementById('postNowBtn');
+            const scheduleBtn = document.getElementById('scheduleBtn');
+            const schedulingSection = document.getElementById('schedulingSection');
+            const btnText = document.getElementById('btnText');
+            const scheduleDateTime = document.getElementById('scheduleDateTime');
+
+            if (mode === 'immediate') {
+                postNowBtn.classList.add('active');
+                scheduleBtn.classList.remove('active');
+                schedulingSection.style.display = 'none';
+                btnText.textContent = '🚀 Generate Post';
+                scheduleDateTime.removeAttribute('required');
+            } else {
+                postNowBtn.classList.remove('active');
+                scheduleBtn.classList.add('active');
+                schedulingSection.style.display = 'block';
+                btnText.textContent = '⏰ Schedule Post';
+                scheduleDateTime.setAttribute('required', 'required');
+
+                // Set minimum datetime to now for scheduling
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                scheduleDateTime.min = now.toISOString().slice(0, 16);
+            }
+
+            if (saveData) {
+                saveFormData();
+            }
+        }
+
+        function setQuickSchedule(type) {
+            const now = new Date();
+            let scheduleDate = new Date();
+
+            // Remove active class from all quick buttons
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+
+            switch (type) {
+                case 'tomorrow-morning':
+                    // Primary posting time - 7 AM (best performance)
+                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setHours(7, 0, 0, 0);
+                    event.target.classList.add('active');
+                    break;
+                case 'tomorrow-lunch':
+                    // Backup posting time - 12 PM (if morning doesn't perform)
+                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setHours(12, 0, 0, 0);
+                    event.target.classList.add('active');
+                    break;
+                case 'tomorrow-evening':
+                    // Alternative backup time - 5 PM (evening engagement)
+                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setHours(17, 0, 0, 0);
+                    event.target.classList.add('active');
+                    break;
+            }
+
+            // Set the datetime input
+            scheduleDate.setMinutes(scheduleDate.getMinutes() - scheduleDate.getTimezoneOffset());
+            document.getElementById('scheduleDateTime').value = scheduleDate.toISOString().slice(0, 16);
+
+            // Save form data
+            saveFormData();
+        }
+
+        function validateScheduledPost() {
+            const scheduleDateTime = document.getElementById('scheduleDateTime').value;
+            if (!scheduleDateTime) {
+                alert('Please select a date and time for scheduling.');
+                return false;
+            }
+
+            const scheduledTime = new Date(scheduleDateTime);
+            const now = new Date();
+
+            if (scheduledTime <= now) {
+                alert('Scheduled time must be in the future.');
+                return false;
+            }
+
+            return true;
+        }
+
         // Navigation functions
         function showPage(pageId) {
-            const pages = ['formPage', 'loadingPage', 'previewPage', 'successPage'];
+            const pages = ['formPage', 'loadingPage', 'previewPage', 'successPage', 'scheduleSuccessPage'];
             pages.forEach(id => {
                 document.getElementById(id).style.display = 'none';
             });
             document.getElementById(pageId).style.display = 'block';
+        }
+
+        function showScheduleSuccess() {
+            // Populate schedule details from current form data
+            const scheduleDateTime = currentFormData['Schedule DateTime'];
+            const seriesName = currentFormData['Series Name'];
+            const productTitle = currentFormData['Product Title'];
+
+            const scheduleInfo = document.getElementById('scheduleInfo');
+            const scheduledTime = new Date(scheduleDateTime);
+
+            scheduleInfo.innerHTML = `
+                <div class="schedule-detail">
+                    <span class="schedule-label">📝 Post Title:</span>
+                    <span class="schedule-value">${productTitle}</span>
+                </div>
+                <div class="schedule-detail">
+                    <span class="schedule-label">📅 Scheduled Date:</span>
+                    <span class="schedule-value">${scheduledTime.toLocaleDateString()}</span>
+                </div>
+                <div class="schedule-detail">
+                    <span class="schedule-label">⏰ Scheduled Time:</span>
+                    <span class="schedule-value">${scheduledTime.toLocaleTimeString()}</span>
+                </div>
+                ${seriesName ? `
+                <div class="schedule-detail">
+                    <span class="schedule-label">📂 Series:</span>
+                    <span class="schedule-value">${seriesName}</span>
+                </div>
+                ` : ''}
+            `;
+
+            showPage('scheduleSuccessPage');
+        }
+
+        function openScheduleManager() {
+            // This would link to your Google Sheets or scheduling dashboard
+            // For now, show an alert with instructions
+            alert('Schedule Manager will open your Google Sheets dashboard where you can view and manage all scheduled posts.');
+
+            // TODO: Replace with actual Google Sheets URL when scheduler workflow is set up
+            // window.open('https://docs.google.com/spreadsheets/YOUR_SHEET_ID', '_blank');
         }
 
         // Real loading progress based on API status
@@ -716,135 +1196,117 @@
         }
 
 
-        // Show preview with generated content
-        function showPreview(previewData) {
-            // Store the generated caption for later use
-            generatedCaption = previewData.caption;
-            
-            // Update preview image
-            const previewImage = document.getElementById('previewImage');
-            previewImage.src = previewData.imageUrl;
-            previewImage.onerror = function() {
-                this.style.display = 'flex';
-                this.innerHTML = '<div style="text-align: center;">Image preview not available</div>';
-            };
-            
-            // Apply selected aspect ratio
-            const aspectRatio = document.getElementById('aspectRatio').value;
-            applyAspectRatio(aspectRatio);
-            
-            // Update caption
-            document.getElementById('previewCaption').textContent = previewData.caption;
-            
-            // Update username if provided
-            if (previewData.username) {
-                const usernames = document.querySelectorAll('.username');
-                usernames.forEach(username => {
-                    username.textContent = previewData.username;
-                });
-                
-                // Update profile pic
-                const profilePic = document.querySelector('.profile-pic');
-                profilePic.textContent = previewData.username.substring(0, 2).toUpperCase();
-            }
-            
-            showPage('previewPage');
-        }
 
-        // Apply aspect ratio to preview image
-        function applyAspectRatio(ratio) {
-            const previewImage = document.getElementById('previewImage');
-            previewImage.className = `post-image ${ratio}`;
-        }
-
-        // Set image fit (cover vs contain)
-        function setImageFit(fitType) {
-            const previewImage = document.getElementById('previewImage');
-            previewImage.style.objectFit = fitType;
-            
-            // Update button states
-            document.getElementById('coverBtn').classList.toggle('active', fitType === 'cover');
-            document.getElementById('containBtn').classList.toggle('active', fitType === 'contain');
-            
-            // Add padding for contain mode to center better
-            if (fitType === 'contain') {
-                previewImage.style.backgroundColor = '#f8f9fa';
-            } else {
-                previewImage.style.backgroundColor = 'transparent';
-            }
-        }
-
-        // Handle form submission
+        // Handle unified form submission
         document.getElementById('postForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
+            const currentMode = getCurrentMode();
+            const isScheduled = currentMode === 'scheduled';
+
+            // Validate scheduled post if needed
+            if (isScheduled && !validateScheduledPost()) {
+                return;
+            }
+
             // Store form data
             currentFormData = {
                 'Product Title': document.getElementById('productTitle').value,
                 'Product Description': document.getElementById('productDescription').value,
                 'Image URL': document.getElementById('imageUrl').value,
-                'Affiliate Link': document.getElementById('affiliateLink').value,
-                'Aspect Ratio': document.getElementById('aspectRatio').value
+                'Affiliate Link': document.getElementById('affiliateLink').value
             };
-            
+
+            // Add scheduling data if scheduled
+            if (isScheduled) {
+                currentFormData['Schedule DateTime'] = document.getElementById('scheduleDateTime').value;
+                currentFormData['Series Name'] = document.getElementById('seriesName').value;
+                currentFormData['Post Type'] = 'scheduled';
+            }
+
             // Generate session ID
-            currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            // Show loading page and start real progress
-            showPage('loadingPage');
-            const progressInterval = startRealProgress();
-            
-            try {
-                // Send to n8n workflow with session ID
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        ...currentFormData,
-                        sessionId: currentSessionId,
-                        action: 'confirm_publish' // Skip preview, go straight to publish
-                    })
-                });
+            const sessionPrefix = isScheduled ? 'schedule_' : 'session_';
+            currentSessionId = sessionPrefix + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
-                // Clear the slow progress interval since API responded
-                clearInterval(progressInterval);
+            if (isScheduled) {
+                // Send to local Node.js scheduler server
+                try {
+                    console.log('Sending to local scheduler:', LOCAL_SCHEDULER_URL);
+                    console.log('Schedule Data:', currentFormData);
 
-                if (response.ok) {
-                    // Complete the progress bar
-                    completeProgress();
-                    
-                    // Wait a moment for the animation to finish
-                    setTimeout(async () => {
-                        try {
-                            const data = await response.json();
-                            console.log('API Response:', data); // Debug log
-                            
-                            // Post published successfully - go to success page
-                            showPage('successPage');
-                        } catch (error) {
-                            console.error('Error parsing response:', error);
-                            showPage('successPage'); // Show success anyway
-                        }
-                    }, 1000); // Wait 1 second for progress animation
-                } else {
-                    throw new Error('Network response was not ok');
+                    const response = await fetch(LOCAL_SCHEDULER_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ...currentFormData,
+                            sessionId: currentSessionId
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Local Scheduler API Response:', data);
+                        showScheduleSuccess();
+                    } else {
+                        console.error('Local Scheduler API Error:', response.status, response.statusText);
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error('Error details:', errorData);
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+
+                } catch (error) {
+                    console.error('Local Scheduler Error:', error);
+                    handleError('Failed to schedule post. Make sure the server is running! Please try again.');
                 }
 
-            } catch (error) {
-                // Clear progress interval on error
-                clearInterval(progressInterval);
-                console.error('Error:', error);
-                handleError('Something went wrong. Please try again!');
+            } else {
+                // Immediate posting - existing workflow
+                showPage('loadingPage');
+                const progressInterval = startRealProgress();
+
+                try {
+                    const response = await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ...currentFormData,
+                            sessionId: currentSessionId,
+                            action: 'confirm_publish'
+                        })
+                    });
+
+                    clearInterval(progressInterval);
+
+                    if (response.ok) {
+                        completeProgress();
+
+                        setTimeout(async () => {
+                            try {
+                                const data = await response.json();
+                                console.log('API Response:', data);
+                                showPage('successPage');
+                            } catch (error) {
+                                console.error('Error parsing response:', error);
+                                showPage('successPage');
+                            }
+                        }, 1000);
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+
+                } catch (error) {
+                    clearInterval(progressInterval);
+                    console.error('Error:', error);
+                    handleError('Something went wrong. Please try again!');
+                }
             }
         });
 
 
-        // Deny post and go back to form
-        function denyPost() {
-            resetForm();
-        }
 
         // Handle errors
         function handleError(message) {
@@ -880,16 +1342,18 @@
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             showPage('formPage');
-            
-            // Load saved form data on page load
+
+            // Load saved form data
             loadFormData();
-            
+
             // Auto-save form data as user types
-            const formFields = ['productTitle', 'productDescription', 'imageUrl', 'affiliateLink', 'aspectRatio'];
+            const formFields = ['productTitle', 'productDescription', 'imageUrl', 'affiliateLink', 'scheduleDateTime', 'seriesName'];
             formFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
-                field.addEventListener('input', saveFormData);
-                field.addEventListener('change', saveFormData);
+                if (field) {
+                    field.addEventListener('input', saveFormData);
+                    field.addEventListener('change', saveFormData);
+                }
             });
         });
     </script>

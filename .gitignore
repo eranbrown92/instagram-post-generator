@@ -134,3 +134,6 @@ dist/
 # Private workflow files
 *.json
 n8n-workflows/
+
+# Exclude server directory (running locally with PM2)
+server/

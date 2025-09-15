@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduled Posts Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .status-scheduled {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-posted {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-failed {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .product-title {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .description {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .datetime {
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .actions-cell {
+            white-space: nowrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 4px;
+            border: 1px solid #ffcdd2;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 4px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .stats {
+            padding: 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Scheduled Posts Admin</h1>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="refreshPosts()">🔄 Refresh</button>
+                <button class="btn btn-warning" onclick="triggerScheduler()">⚡ Trigger Scheduler</button>
+            </div>
+        </div>
+
+        <div class="stats" id="stats">
+            Loading...
+        </div>
+
+        <div id="message"></div>
+
+        <div class="table-container">
+            <table id="postsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product Title</th>
+                        <th>Description</th>
+                        <th>Scheduled Time</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Posted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="postsBody">
+                    <tr>
+                        <td colspan="8" class="loading">Loading posts...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // const API_BASE = 'http://localhost:3001/api'; // Development
+        const API_BASE = 'https://schedule.qwiktechtips.com/api'; // Production via Cloudflare Tunnel
+
+        // Load posts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPosts();
+        });
+
+        // Load all posts from API
+        async function loadPosts() {
+            try {
+                showMessage('', '');
+
+                const response = await fetch(`${API_BASE}/posts`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayPosts(data.data);
+                    updateStats(data.data);
+                } else {
+                    showMessage('error', 'Failed to load posts: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', 'Error loading posts: ' + error.message);
+            }
+        }
+
+        // Display posts in table
+        function displayPosts(posts) {
+            const tbody = document.getElementById('postsBody');
+
+            if (posts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="loading">No scheduled posts found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = posts.map(post => `
+                <tr>
+                    <td>${post.id}</td>
+                    <td class="product-title" title="${escapeHtml(post.product_title)}">${escapeHtml(post.product_title)}</td>
+                    <td class="description" title="${escapeHtml(post.product_description)}">${escapeHtml(post.product_description)}</td>
+                    <td class="datetime">${formatDateTime(post.schedule_datetime)}</td>
+                    <td><span class="status status-${post.status}">${post.status}</span></td>
+                    <td class="datetime">${formatDateTime(post.created_at)}</td>
+                    <td class="datetime">${post.posted_at ? formatDateTime(post.posted_at) : '-'}</td>
+                    <td class="actions-cell">
+                        ${post.status === 'scheduled' ?
+                            `<button class="btn btn-danger" onclick="cancelPost(${post.id})">Cancel</button>` :
+                            `<button class="btn btn-danger" onclick="deletePost(${post.id})">Delete</button>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update stats display
+        function updateStats(posts) {
+            const stats = {
+                total: posts.length,
+                scheduled: posts.filter(p => p.status === 'scheduled').length,
+                posted: posts.filter(p => p.status === 'posted').length,
+                failed: posts.filter(p => p.status === 'failed').length
+            };
+
+            document.getElementById('stats').innerHTML = `
+                Total: ${stats.total} |
+                Scheduled: ${stats.scheduled} |
+                Posted: ${stats.posted} |
+                Failed: ${stats.failed}
+            `;
+        }
+
+        // Cancel a scheduled post
+        async function cancelPost(postId) {
+            if (!confirm('Are you sure you want to cancel this scheduled post?')) {
+                return;
+            }
+
+            try {
+                // For now, we'll delete it since we don't have a cancel endpoint
+                await deletePost(postId);
+            } catch (error) {
+                showMessage('error', 'Error canceling post: ' + error.message);
+            }
+        }
+
+        // Delete a post
+        async function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/posts/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', 'Post deleted successfully!');
+                    loadPosts(); // Refresh the table
+                } else {
+                    showMessage('error', 'Failed to delete post: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', 'Error deleting post: ' + error.message);
+            }
+        }
+
+        // Trigger scheduler manually
+        async function triggerScheduler() {
+            try {
+                showMessage('', '');
+
+                const response = await fetch(`${API_BASE}/trigger-scheduler`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', 'Scheduler triggered successfully! Check server logs for details.');
+                    // Refresh posts after a delay to see status updates
+                    setTimeout(() => {
+                        loadPosts();
+                    }, 2000);
+                } else {
+                    showMessage('error', 'Failed to trigger scheduler: ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', 'Error triggering scheduler: ' + error.message);
+            }
+        }
+
+        // Refresh posts
+        function refreshPosts() {
+            loadPosts();
+        }
+
+        // Show message to user
+        function showMessage(type, message) {
+            const messageDiv = document.getElementById('message');
+
+            if (!message) {
+                messageDiv.innerHTML = '';
+                return;
+            }
+
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Format datetime for display
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleString();
+            } catch (error) {
+                return dateStr;
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadPosts();
+        }, 30000);
+    </script>
+</body>
+</html>
