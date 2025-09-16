@@ -624,6 +624,64 @@
             color: #666;
         }
 
+        /* Live Clock Widget Styles */
+        .live-clock-widget {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .server-time, .local-time {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .time-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .time-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timezone {
+            font-size: 12px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .sync-status {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .time-display {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
         /* Schedule Success Page Styles */
         .schedule-success-icon {
             width: 80px;
@@ -740,6 +798,13 @@
             <div class="header">
                 <h1>📸 Post Generator</h1>
                 <p>Create engaging Instagram content</p>
+            </div>
+
+            <!-- Live Clock Widget -->
+            <div id="liveClock" class="live-clock-widget">
+                <div class="time-display">
+                    <div class="sync-status">🔄 Syncing with server...</div>
+                </div>
             </div>
 
             <!-- Mode Toggle -->
@@ -946,9 +1011,82 @@
         // Node.js server for scheduled posts
         // const LOCAL_SCHEDULER_URL = "http://localhost:3001/api/schedule"; // Development
         const LOCAL_SCHEDULER_URL = "https://schedule.qwiktechtips.com/api/schedule"; // Production via Cloudflare Tunnel
+        const TIME_API_URL = "https://schedule.qwiktechtips.com/api/time"; // Server time API
 
         let currentSessionId = null;
         let currentFormData = null;
+        let serverTimeOffset = 0; // Difference between server and local time
+        let serverTimezone = 'UTC';
+        let liveClockInterval = null;
+
+        // Server time synchronization
+        async function syncServerTime() {
+            try {
+                const response = await fetch(TIME_API_URL);
+                const data = await response.json();
+
+                const serverTime = new Date(data.serverTime);
+                const localTime = new Date();
+                serverTimeOffset = serverTime.getTime() - localTime.getTime();
+                serverTimezone = data.serverTimezone;
+
+                console.log('🕐 Time sync successful:', {
+                    serverTime: serverTime.toISOString(),
+                    localTime: localTime.toISOString(),
+                    offset: serverTimeOffset,
+                    serverTimezone: serverTimezone
+                });
+
+                updateLiveClock();
+                return true;
+            } catch (error) {
+                console.error('❌ Time sync failed:', error);
+                return false;
+            }
+        }
+
+        // Get current server time
+        function getServerTime() {
+            return new Date(Date.now() + serverTimeOffset);
+        }
+
+        // Update live clock display
+        function updateLiveClock() {
+            const clockElement = document.getElementById('liveClock');
+            if (!clockElement) return;
+
+            const serverTime = getServerTime();
+            const localTime = new Date();
+
+            clockElement.innerHTML = `
+                <div class="time-display">
+                    <div class="server-time">
+                        <span class="time-label">Server Time:</span>
+                        <span class="time-value">${serverTime.toLocaleString()}</span>
+                        <span class="timezone">(${serverTimezone})</span>
+                    </div>
+                    <div class="local-time">
+                        <span class="time-label">Your Time:</span>
+                        <span class="time-value">${localTime.toLocaleString()}</span>
+                        <span class="timezone">(Local)</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Start live clock updates
+        function startLiveClock() {
+            if (liveClockInterval) clearInterval(liveClockInterval);
+            liveClockInterval = setInterval(updateLiveClock, 1000);
+        }
+
+        // Stop live clock updates
+        function stopLiveClock() {
+            if (liveClockInterval) {
+                clearInterval(liveClockInterval);
+                liveClockInterval = null;
+            }
+        }
 
         // Unified localStorage functions
         function saveFormData() {
@@ -1015,11 +1153,11 @@
                 btnText.textContent = '⏰ Schedule Post';
                 scheduleDateTime.setAttribute('required', 'required');
 
-                // Set minimum datetime to now for scheduling
-                const now = new Date();
-                // Convert to local timezone for datetime-local input
-                const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-                scheduleDateTime.min = localNow.toISOString().slice(0, 16);
+                // Set minimum datetime based on server time
+                const serverTime = getServerTime();
+                // Convert server time to local timezone for datetime-local input
+                const localServerTime = new Date(serverTime.getTime() - serverTime.getTimezoneOffset() * 60000);
+                scheduleDateTime.min = localServerTime.toISOString().slice(0, 16);
             }
 
             if (saveData) {
@@ -1028,8 +1166,9 @@
         }
 
         function setQuickSchedule(type) {
-            const now = new Date();
-            let scheduleDate = new Date();
+            // Use server time for scheduling
+            const serverTime = getServerTime();
+            let scheduleDate = new Date(serverTime);
 
             // Remove active class from all quick buttons
             document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
@@ -1037,26 +1176,27 @@
             switch (type) {
                 case 'tomorrow-morning':
                     // Primary posting time - 7 AM (best performance)
-                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setDate(serverTime.getDate() + 1);
                     scheduleDate.setHours(7, 0, 0, 0);
                     event.target.classList.add('active');
                     break;
                 case 'tomorrow-lunch':
                     // Backup posting time - 12 PM (if morning doesn't perform)
-                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setDate(serverTime.getDate() + 1);
                     scheduleDate.setHours(12, 0, 0, 0);
                     event.target.classList.add('active');
                     break;
                 case 'tomorrow-evening':
                     // Alternative backup time - 5 PM (evening engagement)
-                    scheduleDate.setDate(now.getDate() + 1);
+                    scheduleDate.setDate(serverTime.getDate() + 1);
                     scheduleDate.setHours(17, 0, 0, 0);
                     event.target.classList.add('active');
                     break;
             }
 
-            // Set the datetime input
-            document.getElementById('scheduleDateTime').value = scheduleDate.toISOString().slice(0, 16);
+            // Convert to local timezone for datetime-local input display
+            const localScheduleDate = new Date(scheduleDate.getTime() - scheduleDate.getTimezoneOffset() * 60000);
+            document.getElementById('scheduleDateTime').value = localScheduleDate.toISOString().slice(0, 16);
 
             // Save form data
             saveFormData();
@@ -1364,8 +1504,14 @@
         }
 
         // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             showPage('formPage');
+
+            // Initialize server time sync
+            const timeSync = await syncServerTime();
+            if (timeSync) {
+                startLiveClock();
+            }
 
             // Load saved form data
             loadFormData();
@@ -1380,6 +1526,9 @@
                 }
             });
         });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', stopLiveClock);
     </script>
 </body>
 </html>
