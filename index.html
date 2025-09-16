@@ -1223,11 +1223,20 @@
 
                 // Convert datetime-local to proper timezone-aware format
                 // datetime-local gives us "YYYY-MM-DDTHH:MM" in local timezone
-                // We need to ensure the server understands this correctly
+                // We need to treat this as local time and convert to UTC
                 const localDate = new Date(rawDateTime);
-                const timezoneAdjustedDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+                const timezoneOffsetMs = localDate.getTimezoneOffset() * 60000;
+                const utcDate = new Date(localDate.getTime() + timezoneOffsetMs);
 
-                currentFormData['Schedule DateTime'] = timezoneAdjustedDate.toISOString();
+                console.log('🕐 Timezone conversion debug:', {
+                    rawDateTime,
+                    localDate: localDate.toISOString(),
+                    timezoneOffset: localDate.getTimezoneOffset(),
+                    utcDate: utcDate.toISOString(),
+                    now: new Date().toISOString()
+                });
+
+                currentFormData['Schedule DateTime'] = utcDate.toISOString();
                 currentFormData['Series Name'] = document.getElementById('seriesName').value;
                 currentFormData['Post Type'] = 'scheduled';
             }
