@@ -1017,7 +1017,6 @@
 
                 // Set minimum datetime to now for scheduling
                 const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                 scheduleDateTime.min = now.toISOString().slice(0, 16);
             }
 
@@ -1055,7 +1054,6 @@
             }
 
             // Set the datetime input
-            scheduleDate.setMinutes(scheduleDate.getMinutes() - scheduleDate.getTimezoneOffset());
             document.getElementById('scheduleDateTime').value = scheduleDate.toISOString().slice(0, 16);
 
             // Save form data
