@@ -1096,7 +1096,21 @@
             const productTitle = currentFormData['Product Title'];
 
             const scheduleInfo = document.getElementById('scheduleInfo');
-            const scheduledTime = new Date(scheduleDateTime);
+
+            // Handle datetime display properly - scheduleDateTime is in format "YYYY-MM-DDTHH:MM"
+            let displayDate, displayTime;
+            if (scheduleDateTime.includes('T') && scheduleDateTime.length <= 16) {
+                // Raw datetime-local format from input
+                const [datePart, timePart] = scheduleDateTime.split('T');
+                const dateObj = new Date(scheduleDateTime);
+                displayDate = dateObj.toLocaleDateString();
+                displayTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else {
+                // ISO format from server response
+                const scheduledTime = new Date(scheduleDateTime);
+                displayDate = scheduledTime.toLocaleDateString();
+                displayTime = scheduledTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
 
             scheduleInfo.innerHTML = `
                 <div class="schedule-detail">
@@ -1105,11 +1119,11 @@
                 </div>
                 <div class="schedule-detail">
                     <span class="schedule-label">📅 Scheduled Date:</span>
-                    <span class="schedule-value">${scheduledTime.toLocaleDateString()}</span>
+                    <span class="schedule-value">${displayDate}</span>
                 </div>
                 <div class="schedule-detail">
                     <span class="schedule-label">⏰ Scheduled Time:</span>
-                    <span class="schedule-value">${scheduledTime.toLocaleTimeString()}</span>
+                    <span class="schedule-value">${displayTime}</span>
                 </div>
                 ${seriesName ? `
                 <div class="schedule-detail">
@@ -1221,22 +1235,15 @@
             if (isScheduled) {
                 const rawDateTime = document.getElementById('scheduleDateTime').value;
 
-                // Convert datetime-local to proper timezone-aware format
-                // datetime-local gives us "YYYY-MM-DDTHH:MM" in local timezone
-                // We need to treat this as local time and convert to UTC
-                const localDate = new Date(rawDateTime);
-                const timezoneOffsetMs = localDate.getTimezoneOffset() * 60000;
-                const utcDate = new Date(localDate.getTime() + timezoneOffsetMs);
-
-                console.log('🕐 Timezone conversion debug:', {
+                // Send the raw datetime value - let the server handle timezone interpretation
+                // This preserves the local time as intended by the user
+                console.log('🕐 Timezone debug:', {
                     rawDateTime,
-                    localDate: localDate.toISOString(),
-                    timezoneOffset: localDate.getTimezoneOffset(),
-                    utcDate: utcDate.toISOString(),
-                    now: new Date().toISOString()
+                    userLocalTime: new Date(rawDateTime).toString(),
+                    now: new Date().toString()
                 });
 
-                currentFormData['Schedule DateTime'] = utcDate.toISOString();
+                currentFormData['Schedule DateTime'] = rawDateTime;
                 currentFormData['Series Name'] = document.getElementById('seriesName').value;
                 currentFormData['Post Type'] = 'scheduled';
             }
