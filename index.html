@@ -1219,7 +1219,15 @@
 
             // Add scheduling data if scheduled
             if (isScheduled) {
-                currentFormData['Schedule DateTime'] = document.getElementById('scheduleDateTime').value;
+                const rawDateTime = document.getElementById('scheduleDateTime').value;
+
+                // Convert datetime-local to proper timezone-aware format
+                // datetime-local gives us "YYYY-MM-DDTHH:MM" in local timezone
+                // We need to ensure the server understands this correctly
+                const localDate = new Date(rawDateTime);
+                const timezoneAdjustedDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+
+                currentFormData['Schedule DateTime'] = timezoneAdjustedDate.toISOString();
                 currentFormData['Series Name'] = document.getElementById('seriesName').value;
                 currentFormData['Post Type'] = 'scheduled';
             }
