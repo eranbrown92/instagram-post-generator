@@ -1375,15 +1375,21 @@
             if (isScheduled) {
                 const rawDateTime = document.getElementById('scheduleDateTime').value;
 
-                // Send the raw datetime value - let the server handle timezone interpretation
-                // This preserves the local time as intended by the user
-                console.log('🕐 Timezone debug:', {
+                // Convert datetime-local to server timezone for proper scheduling
+                // rawDateTime is in format "YYYY-MM-DDTHH:MM" (local timezone)
+                const localDate = new Date(rawDateTime);
+                const serverDate = new Date(localDate.getTime() + serverTimeOffset);
+
+                console.log('🕐 Timezone conversion debug:', {
                     rawDateTime,
-                    userLocalTime: new Date(rawDateTime).toString(),
-                    now: new Date().toString()
+                    localDate: localDate.toString(),
+                    serverDate: serverDate.toString(),
+                    serverDateISO: serverDate.toISOString(),
+                    serverTimeOffset: serverTimeOffset
                 });
 
-                currentFormData['Schedule DateTime'] = rawDateTime;
+                // Send the server-timezone-adjusted datetime
+                currentFormData['Schedule DateTime'] = serverDate.toISOString();
                 currentFormData['Series Name'] = document.getElementById('seriesName').value;
                 currentFormData['Post Type'] = 'scheduled';
             }
