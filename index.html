@@ -1017,7 +1017,9 @@
 
                 // Set minimum datetime to now for scheduling
                 const now = new Date();
-                scheduleDateTime.min = now.toISOString().slice(0, 16);
+                // Convert to local timezone for datetime-local input
+                const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+                scheduleDateTime.min = localNow.toISOString().slice(0, 16);
             }
 
             if (saveData) {
